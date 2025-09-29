@@ -1,0 +1,72 @@
+<mat-toolbar color="primary" class="toolbar">
+  <span>Document parser</span>
+  <span class="spacer"></span>
+  <button mat-stroked-button color="accent" (click)="logout()">Logout</button>
+</mat-toolbar>
+
+<div class="container">
+  <mat-card class="upload-card mat-elevation-z2">
+    <div class="upload-section">
+      <input
+        type="file"
+        (change)="onFileSelected($event)"
+        accept="application/pdf"
+        id="fileInput"
+        hidden
+      />
+      <label for="fileInput" class="upload-label" mat-stroked-button>
+        Upload document
+      </label>
+      <span class="file-name" *ngIf="selectedFile">{{ selectedFile.name }}</span>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="parseDocument()"
+        [disabled]="!selectedFile"
+      >
+        Parse
+      </button>
+    </div>
+  </mat-card>
+
+  <mat-card class="form-card mat-elevation-z4" *ngIf="formVisible">
+    <form [formGroup]="parserForm" (ngSubmit)="submitForm()" class="parser-form">
+      <mat-form-field appearance="outline" class="small-input">
+        <mat-label>Employee</mat-label>
+        <input matInput formControlName="employeeName" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="small-input">
+        <mat-label>Security organizaton</mat-label>
+        <input matInput formControlName="securityOrg" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="small-input">
+        <mat-label>Affected organization</mat-label>
+        <input matInput formControlName="affectedOrg" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="small-input">
+        <mat-label>Severity</mat-label>
+        <mat-select formControlName="incidentSeverity">
+          <mat-option value="Niska">LOW</mat-option>
+          <mat-option value="Srednja">MEDIUM</mat-option>
+          <mat-option value="Visoka">HIGH</mat-option>
+          <mat-option value="Kritična">CRITICAL</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="small-input">
+        <mat-label>Address of affected organization</mat-label>
+        <input matInput formControlName="affectedAddress" />
+      </mat-form-field>
+
+      <div class="form-buttons">
+        <button mat-flat-button color="primary" type="submit">Confirm</button>
+        <button mat-stroked-button color="warn" type="button" (click)="cancelForm()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>

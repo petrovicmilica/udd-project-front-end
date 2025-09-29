@@ -1,0 +1,88 @@
+/* Toolbar */
+.toolbar {
+  padding: 0 1rem;
+  font-size: 1rem;
+}
+
+/* Spacer */
+.spacer {
+  flex: 1 1 auto;
+}
+
+/* Container */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1.5rem auto;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* Upload Card */
+.upload-card {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.upload-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.upload-label {
+  font-size: 0.9rem;
+}
+
+.file-name {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* Form Card */
+.form-card {
+  width: 100%;
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+/* Compact form */
+.parser-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.small-input {
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+/* Buttons */
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+button {
+  font-size: 0.9rem;
+  padding: 0.35rem 1rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    margin: 1rem;
+  }
+
+  .upload-section {
+    flex-direction: column;
+  }
+}
