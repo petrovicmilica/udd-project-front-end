@@ -7,6 +7,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
+import { DocumentParserService } from '../../services/document-parser.service';
+import { SecurityIncidentReportResponse } from '../../models/SecurityIncidentReportResponse';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-document-parser',
@@ -21,15 +24,17 @@ import { CommonModule } from '@angular/common';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatCardModule
+    MatCardModule,
+    HttpClientModule
   ]
 })
 export class DocumentParserComponent {
   formVisible = false;
   parserForm: FormGroup;
   selectedFile: File | null = null;
+  parsedReport: SecurityIncidentReportResponse | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private parserService: DocumentParserService) {
     this.parserForm = this.fb.group({
       employeeName: [''],
       securityOrg: [''],
@@ -47,17 +52,23 @@ export class DocumentParserComponent {
   parseDocument() {
     if (!this.selectedFile) return;
 
-    console.log('Parsing document:', this.selectedFile.name);
-
-    this.parserForm.patchValue({
-      employeeName: 'Marko Markovic',
-      securityOrg: 'Security Agency',
-      affectedOrg: 'Affected Organization',
-      incidentSeverity: 'Medium',
-      affectedAddress: 'Belgrade, Serbia'
+    this.parserService.parseDocument(this.selectedFile).subscribe({
+      next: (report) => {
+        this.parsedReport = report;
+        this.formVisible = true; 
+        this.parserForm.patchValue({
+          employeeName: report.employeeName,
+          securityOrg: report.securityOrganizationName,
+          affectedOrg: report.affectedOrganizationName,
+          incidentSeverity: report.severityLevel,
+          affectedAddress: report.affectedOrganizationAddress
+        });
+      },
+      error: (err) => {
+        console.error('Failed to parse document', err);
+        alert('Failed to parse document.');
+      }
     });
-
-    this.formVisible = true;
   }
 
   submitForm() {
@@ -65,11 +76,13 @@ export class DocumentParserComponent {
     alert('Indexing confirmed!');
     this.formVisible = false;
     this.selectedFile = null;
+    this.parsedReport = null;
   }
 
   cancelForm() {
     this.formVisible = false;
     this.selectedFile = null;
+    this.parsedReport = null;
   }
 
   logout() {
