@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { DocumentParserService } from '../../services/document-parser.service';
 import { SecurityIncidentReportResponse } from '../../models/SecurityIncidentReportResponse';
 import { HttpClientModule } from '@angular/common/http';
+import { SecurityIncidentReportRequest } from '../../models/SecurityIncidentReportRequest';
 
 @Component({
   selector: 'app-document-parser',
@@ -72,12 +73,31 @@ export class DocumentParserComponent {
   }
 
   submitForm() {
-    console.log('Form submitted', this.parserForm.value);
-    alert('Indexing confirmed!');
-    this.formVisible = false;
-    this.selectedFile = null;
-    this.parsedReport = null;
-  }
+  if (!this.selectedFile) return;
+
+  const request: SecurityIncidentReportRequest = {
+    employeeName: this.parserForm.value.employeeName || 'Nepoznato',
+    securityOrganizationName: this.parserForm.value.securityOrg || 'Nepoznato',
+    affectedOrganizationName: this.parserForm.value.affectedOrg || 'Nepoznato',
+    severityLevel: this.parserForm.value.incidentSeverity || 'LOW',
+    affectedOrganizationAddress: this.parserForm.value.affectedAddress || 'Nepoznato',
+    reportContent: this.parsedReport?.reportContent || ''
+  };
+
+  this.parserService.uploadDocument(this.selectedFile, request).subscribe({
+    next: (response) => {
+      console.log('Upload confirmed', response);
+      alert('Upload confirmed!');
+      this.formVisible = false;
+      this.selectedFile = null;
+      this.parsedReport = null;
+    },
+    error: (err) => {
+      console.error('Failed to upload document', err);
+      alert('Failed to upload document.');
+    }
+  });
+}
 
   cancelForm() {
     this.formVisible = false;

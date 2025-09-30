@@ -15,4 +15,15 @@ export class DocumentParserService {
 
     return this.http.post<SecurityIncidentReportResponse>(`${this.baseUrl}/parse`, formData);
   }
+
+  uploadDocument(file: File, metadata: any): Observable<SecurityIncidentReportResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+
+  return this.http.post<SecurityIncidentReportResponse>(
+    `${this.baseUrl}/upload/confirm`,
+    formData
+  );
+}
 }
