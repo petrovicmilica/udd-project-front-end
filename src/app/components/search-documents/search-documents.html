@@ -17,6 +17,26 @@
         />
       </mat-form-field>
 
+      <div class="geo-options">
+        <mat-checkbox formControlName="geoSearch">Enable geolocation search</mat-checkbox>
+
+        <mat-form-field
+          *ngIf="searchForm.get('geoSearch')?.value"
+          appearance="outline"
+          class="radius-field"
+        >
+          <mat-label>Radius (meters)</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="radius"
+            placeholder="Enter radius in meters"
+          />
+        </mat-form-field>
+      </div>
+
+    
+
       <div class="form-buttons">
         <button mat-flat-button color="primary" type="submit">Search</button>
         <button mat-stroked-button color="warn" type="button" (click)="onClear()">Clear</button>

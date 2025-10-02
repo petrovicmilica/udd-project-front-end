@@ -12,6 +12,7 @@ import { SecurityIncidentReportService } from '../../services/security-incident-
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { getKeycloak } from '../../auth/keycloak.init';
 import { DocumentSearchRequest } from '../../models/DocumentSearchRequest';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-search-documents',
@@ -26,13 +27,15 @@ import { DocumentSearchRequest } from '../../models/DocumentSearchRequest';
     MatFormFieldModule,
     MatInputModule,
     MatCardModule, 
-    SafeHtmlPipe
+    SafeHtmlPipe,
+    MatCheckboxModule
   ]
 })
 export class SearchDocumentsComponent{
   searchForm: FormGroup;
   results: SecurityIncidentReportResponse[] = [];
   hasSearched: boolean = false;
+  searchType: string = '';
 
   constructor(
     private router: Router,
@@ -40,43 +43,59 @@ export class SearchDocumentsComponent{
     private reportService: SecurityIncidentReportService
   ) {
     this.searchForm = this.fb.group({
-      keywords: ['']
+      keywords: [''],
+      geoSearch: [false],  
+      radius: ['']
     });
   }
 
   onSearch() {
-    this.hasSearched = true;
-    let searchRequest: DocumentSearchRequest;
-    const input: string = this.searchForm.value.keywords.trim();
+  this.hasSearched = true;
 
-    if (!input) {
-      this.results = [];
-      return;
-    }
+  const keywordsInput: string = this.searchForm.value.keywords.trim();
+  const geoEnabled: boolean = this.searchForm.value.geoSearch;
+  const radius: number = geoEnabled ? Number(this.searchForm.value.radius) : 0;
 
-    const booleanOrPhraseRegex = /\b(AND|OR|NOT)\b|".+?"/i;
-    let searchType = '';
-
-    if (booleanOrPhraseRegex.test(input)) {
-      console.log("u pitanju je boolean pretraga");
-      searchRequest = {
-        searchKeywords: [],
-        booleanQuery: input
-      };
-      searchType = 'boolean';
-    } else {
-      console.log("u pitanju je simple pretraga");
-      const keywords = this.searchForm.value.keywords.split(' ').filter((k: string) => k.trim() !== '');
-      searchRequest = {
-        searchKeywords: keywords,
-        booleanQuery: ''
-      };
-      searchType = 'simple';
+  if (!keywordsInput) {
+    this.results = [];
+    return;
   }
 
-  console.log('Search request:', searchRequest);
+  let searchRequest: DocumentSearchRequest;
 
-  this.reportService.searchDocuments(searchRequest, searchType).subscribe({
+  if (geoEnabled) {
+    // Ako je geolocation search aktivan
+    searchRequest = {
+      searchKeywords: [keywordsInput],  // ubaci ceo input kao jedan string
+      booleanQuery: '',
+      radius: radius
+    };
+    this.searchType = 'geolocation';
+  } else {
+    // Standardna pretraga: boolean ili simple
+    const booleanOrPhraseRegex = /\b(AND|OR|NOT)\b|".+?"/i;
+
+    if (booleanOrPhraseRegex.test(keywordsInput)) {
+      searchRequest = {
+        searchKeywords: [],
+        booleanQuery: keywordsInput,
+        radius: 0
+      };
+      this.searchType = 'boolean';
+    } else {
+      const keywords = keywordsInput.split(' ').filter(k => k.trim() !== '');
+      searchRequest = {
+        searchKeywords: keywords,
+        booleanQuery: '',
+        radius: 0
+      };
+      this.searchType = 'simple';
+    }
+  }
+
+  console.log('Search request:', searchRequest, 'Type:', this.searchType);
+
+  this.reportService.searchDocuments(searchRequest, this.searchType).subscribe({
     next: (data) => {
       console.log('Search results:', data);
       this.results = data;
@@ -86,6 +105,7 @@ export class SearchDocumentsComponent{
     }
   });
 }
+
 
   onClear() {
     this.searchForm.reset();
@@ -160,6 +180,13 @@ export class SearchDocumentsComponent{
 
   getAllDynamicSummaries(r: SecurityIncidentReportResponse): string[] {
   const out: string[] = [];
+
+  if (this.searchType === 'geolocation') {
+    if (r.affectedOrganizationAddress) {
+      out.push(r.affectedOrganizationAddress);
+    }
+    return out;
+  }
 
   const fields: Array<{ key: keyof SecurityIncidentReportResponse; radius: number; maxChunks: number }> = [
     { key: 'employeeName', radius: 20, maxChunks: 2 },
