@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
-import { DocumentParserService } from '../../services/document-parser.service';
+import { SecurityIncidentReportService } from '../../services/security-incident-report.service';
 import { SecurityIncidentReportResponse } from '../../models/SecurityIncidentReportResponse';
 import { HttpClientModule } from '@angular/common/http';
 import { SecurityIncidentReportRequest } from '../../models/SecurityIncidentReportRequest';
@@ -35,7 +35,7 @@ export class DocumentParserComponent {
   selectedFile: File | null = null;
   parsedReport: SecurityIncidentReportResponse | null = null;
 
-  constructor(private fb: FormBuilder, private parserService: DocumentParserService) {
+  constructor(private fb: FormBuilder, private reportService: SecurityIncidentReportService) {
     this.parserForm = this.fb.group({
       employeeName: [''],
       securityOrg: [''],
@@ -53,7 +53,7 @@ export class DocumentParserComponent {
   parseDocument() {
     if (!this.selectedFile) return;
 
-    this.parserService.parseDocument(this.selectedFile).subscribe({
+    this.reportService.parseDocument(this.selectedFile).subscribe({
       next: (report) => {
         this.parsedReport = report;
         this.formVisible = true; 
@@ -84,7 +84,7 @@ export class DocumentParserComponent {
     reportContent: this.parsedReport?.reportContent || ''
   };
 
-  this.parserService.uploadDocument(this.selectedFile, request).subscribe({
+  this.reportService.uploadDocument(this.selectedFile, request).subscribe({
     next: (response) => {
       console.log('Upload confirmed', response);
       alert('Upload confirmed!');

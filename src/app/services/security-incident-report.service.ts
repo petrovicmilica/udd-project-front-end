@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { SecurityIncidentReportResponse } from '../models/SecurityIncidentReportResponse';
 
 @Injectable({ providedIn: 'root' })
-export class DocumentParserService {
+export class SecurityIncidentReportService {
   private baseUrl = 'http://localhost:8080/api/v1/security-incident-report';
 
   constructor(private http: HttpClient) {}
@@ -25,5 +25,13 @@ export class DocumentParserService {
     `${this.baseUrl}/upload/confirm`,
     formData
   );
-}
+  
+  }
+
+  searchDocuments(keywords: string[], searchType: string): Observable<SecurityIncidentReportResponse[]> {
+    return this.http.post<SecurityIncidentReportResponse[]>(
+      `${this.baseUrl}/search/${searchType}`,
+      { searchKeywords: keywords }
+    );
+  }
 }

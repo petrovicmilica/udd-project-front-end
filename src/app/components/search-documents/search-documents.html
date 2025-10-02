@@ -1,0 +1,48 @@
+<mat-toolbar color="primary" class="toolbar">
+  <span>Search Documents</span>
+  <span class="spacer"></span>
+  <button mat-stroked-button color="accent">Logout</button>
+</mat-toolbar>
+
+<div class="container">
+  <!-- Search Input -->
+  <mat-card class="search-card mat-elevation-z3">
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Keywords</mat-label>
+        <input
+          matInput
+          formControlName="keywords"
+          placeholder="Enter keywords separated by / or ,"
+        />
+      </mat-form-field>
+
+      <div class="form-buttons">
+        <button mat-flat-button color="primary" type="submit">Search</button>
+        <button mat-stroked-button color="warn" type="button" (click)="onClear()">Clear</button>
+      </div>
+    </form>
+  </mat-card>
+
+<ng-container *ngIf="results.length > 0; else noResults">
+    <mat-card
+      class="result-card mat-elevation-z2"
+      *ngFor="let result of results"
+    >
+      <div class="doc-snippets" *ngIf="getAllDynamicSummaries(result).length > 0">
+        <p
+          class="doc-snippet"
+          *ngFor="let snippet of getAllDynamicSummaries(result)"
+          [innerHTML]="snippet | safeHtml"
+        ></p>
+      </div>
+    </mat-card>
+  </ng-container>
+
+  <ng-template #noResults>
+    <mat-card class="result-card mat-elevation-z2">
+      <div class="info">No documents found. Try different keywords.</div>
+    </mat-card>
+  </ng-template>
+
+</div>

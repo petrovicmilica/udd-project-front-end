@@ -1,0 +1,78 @@
+.toolbar {
+  padding: 0 1rem;
+  font-size: 1rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1.5rem auto;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-card {
+  width: 100%;
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+button {
+  font-size: 0.9rem;
+  padding: 0.35rem 1rem;
+}
+
+/* Result Card */
+.result-card {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.result-card h3 {
+  margin: 0 0 0.5rem 0;
+}
+
+.result-card p {
+  margin: 0;
+  color: #444;
+  font-size: 0.9rem;
+}
+
+.highlight {
+  color: blue;
+  font-weight: bold;
+  background-color: red; /* svetloplava pozadina */
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+em.highlight {
+  color: blue;
+  font-weight: bold;
+  background-color: red;
+  padding: 0 2px;
+  border-radius: 2px;
+}
