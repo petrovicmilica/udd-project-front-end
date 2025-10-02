@@ -45,7 +45,8 @@ export class SearchDocumentsComponent{
     this.searchForm = this.fb.group({
       keywords: [''],
       geoSearch: [false],  
-      radius: ['']
+      radius: [''],
+      knn: [false]
     });
   }
 
@@ -54,6 +55,7 @@ export class SearchDocumentsComponent{
 
   const keywordsInput: string = this.searchForm.value.keywords.trim();
   const geoEnabled: boolean = this.searchForm.value.geoSearch;
+  const knnEnabled: boolean = this.searchForm.value.knn;
   const radius: number = geoEnabled ? Number(this.searchForm.value.radius) : 0;
 
   if (!keywordsInput) {
@@ -63,16 +65,22 @@ export class SearchDocumentsComponent{
 
   let searchRequest: DocumentSearchRequest;
 
-  if (geoEnabled) {
-    // Ako je geolocation search aktivan
+  if (knnEnabled) {
+    const keywords = keywordsInput.split(' ').filter(k => k.trim() !== '');
     searchRequest = {
-      searchKeywords: [keywordsInput],  // ubaci ceo input kao jedan string
+      searchKeywords: keywords,
+      booleanQuery: '',
+      radius: 0
+    };
+    this.searchType = 'knn';
+  } else if (geoEnabled) {
+    searchRequest = {
+      searchKeywords: [keywordsInput],  
       booleanQuery: '',
       radius: radius
     };
     this.searchType = 'geolocation';
   } else {
-    // Standardna pretraga: boolean ili simple
     const booleanOrPhraseRegex = /\b(AND|OR|NOT)\b|".+?"/i;
 
     if (booleanOrPhraseRegex.test(keywordsInput)) {
