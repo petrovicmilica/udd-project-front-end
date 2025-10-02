@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +11,7 @@ import { SecurityIncidentReportService } from '../../services/security-incident-
 import { SecurityIncidentReportResponse } from '../../models/SecurityIncidentReportResponse';
 import { HttpClientModule } from '@angular/common/http';
 import { SecurityIncidentReportRequest } from '../../models/SecurityIncidentReportRequest';
+import { getKeycloak } from '../../auth/keycloak.init';
 
 @Component({
   selector: 'app-document-parser',
@@ -29,7 +30,7 @@ import { SecurityIncidentReportRequest } from '../../models/SecurityIncidentRepo
     HttpClientModule
   ]
 })
-export class DocumentParserComponent {
+export class DocumentParserComponent implements OnInit{
   formVisible = false;
   parserForm: FormGroup;
   selectedFile: File | null = null;
@@ -43,6 +44,17 @@ export class DocumentParserComponent {
       incidentSeverity: [''],
       affectedAddress: ['']
     });
+  }
+
+  ngOnInit(): void {
+    const kc = getKeycloak();
+    const idTokenParsed = kc.idTokenParsed;  
+    const accessToken = kc.token;
+    const username = kc.idTokenParsed?.['preferred_username'] ?? kc.tokenParsed?.['preferred_username'];
+
+    console.log('id token parsed: ', idTokenParsed);
+    console.log('access token: ', accessToken);
+    console.log('username: ', username);
   }
 
   onFileSelected(event: any) {
