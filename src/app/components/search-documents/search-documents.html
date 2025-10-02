@@ -1,11 +1,11 @@
 <mat-toolbar color="primary" class="toolbar">
-  <span>Search Documents</span>
+  <span></span>
   <span class="spacer"></span>
-  <button mat-stroked-button color="accent">Logout</button>
+  <button mat-stroked-button color="accent" (click)="navigateToDocumentParser()">Document parser</button>
+  <button mat-stroked-button color="accent" (click)="logout()">Logout</button>
 </mat-toolbar>
 
 <div class="container">
-  <!-- Search Input -->
   <mat-card class="search-card mat-elevation-z3">
     <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
       <mat-form-field appearance="outline" class="full-width">
@@ -13,7 +13,7 @@
         <input
           matInput
           formControlName="keywords"
-          placeholder="Enter keywords separated by / or ,"
+          placeholder="Enter keywords separated by / or , or query"
         />
       </mat-form-field>
 
@@ -40,9 +40,11 @@
   </ng-container>
 
   <ng-template #noResults>
-    <mat-card class="result-card mat-elevation-z2">
-      <div class="info">No documents found. Try different keywords.</div>
-    </mat-card>
+    <ng-container *ngIf="hasSearched">
+      <mat-card class="result-card mat-elevation-z2">
+        <div class="info">No documents found. Try again.</div>
+      </mat-card>
+    </ng-container>
   </ng-template>
 
 </div>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -36,7 +37,7 @@ export class DocumentParserComponent implements OnInit{
   selectedFile: File | null = null;
   parsedReport: SecurityIncidentReportResponse | null = null;
 
-  constructor(private fb: FormBuilder, private reportService: SecurityIncidentReportService) {
+  constructor(private router: Router, private fb: FormBuilder, private reportService: SecurityIncidentReportService) {
     this.parserForm = this.fb.group({
       employeeName: [''],
       securityOrg: [''],
@@ -118,7 +119,12 @@ export class DocumentParserComponent implements OnInit{
   }
 
   logout() {
-    console.log('Logout clicked');
-    // TODO: implement logout
+    getKeycloak().logout({
+      redirectUri: window.location.origin,
+    });
+  }
+
+  navigateToSearch() {
+    this.router.navigate(['/search']);
   }
 }

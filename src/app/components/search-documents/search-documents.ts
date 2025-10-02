@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -10,6 +11,7 @@ import { SecurityIncidentReportResponse } from '../../models/SecurityIncidentRep
 import { SecurityIncidentReportService } from '../../services/security-incident-report.service';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { getKeycloak } from '../../auth/keycloak.init';
+import { DocumentSearchRequest } from '../../models/DocumentSearchRequest';
 
 @Component({
   selector: 'app-search-documents',
@@ -27,11 +29,13 @@ import { getKeycloak } from '../../auth/keycloak.init';
     SafeHtmlPipe
   ]
 })
-export class SearchDocumentsComponent {
+export class SearchDocumentsComponent{
   searchForm: FormGroup;
   results: SecurityIncidentReportResponse[] = [];
+  hasSearched: boolean = false;
 
   constructor(
+    private router: Router,
     private fb: FormBuilder,
     private reportService: SecurityIncidentReportService
   ) {
@@ -41,23 +45,52 @@ export class SearchDocumentsComponent {
   }
 
   onSearch() {
-    const keywords = this.searchForm.value.keywords.split(' ').filter((k: string) => k.trim() !== '');
-    console.log('Searching with keywords:', keywords);
+    this.hasSearched = true;
+    let searchRequest: DocumentSearchRequest;
+    const input: string = this.searchForm.value.keywords.trim();
 
-    this.reportService.searchDocuments(keywords, 'simple').subscribe({
-      next: (data) => {
-        console.log('Search results:', data);
-        this.results = data;
-      },
-      error: (err) => {
-        console.error('Search error:', err);
-      }
-    });
+    if (!input) {
+      this.results = [];
+      return;
+    }
+
+    const booleanOrPhraseRegex = /\b(AND|OR|NOT)\b|".+?"/i;
+    let searchType = '';
+
+    if (booleanOrPhraseRegex.test(input)) {
+      console.log("u pitanju je boolean pretraga");
+      searchRequest = {
+        searchKeywords: [],
+        booleanQuery: input
+      };
+      searchType = 'boolean';
+    } else {
+      console.log("u pitanju je simple pretraga");
+      const keywords = this.searchForm.value.keywords.split(' ').filter((k: string) => k.trim() !== '');
+      searchRequest = {
+        searchKeywords: keywords,
+        booleanQuery: ''
+      };
+      searchType = 'simple';
   }
+
+  console.log('Search request:', searchRequest);
+
+  this.reportService.searchDocuments(searchRequest, searchType).subscribe({
+    next: (data) => {
+      console.log('Search results:', data);
+      this.results = data;
+    },
+    error: (err) => {
+      console.error('Search error:', err);
+    }
+  });
+}
 
   onClear() {
     this.searchForm.reset();
     this.results = [];
+    this.hasSearched = false;
   }
 
   toggleExpanded(result: any) {
@@ -149,4 +182,14 @@ export class SearchDocumentsComponent {
 
   return Array.from(new Set(out));
 }
+
+  logout() {
+    getKeycloak().logout({
+      redirectUri: window.location.origin,
+    });
+  }
+
+  navigateToDocumentParser() {
+    this.router.navigate(['/document-parser']);
+  }
 }

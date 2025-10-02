@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SecurityIncidentReportResponse } from '../models/SecurityIncidentReportResponse';
+import { DocumentSearchRequest } from '../models/DocumentSearchRequest';
 
 @Injectable({ providedIn: 'root' })
 export class SecurityIncidentReportService {
@@ -28,10 +29,10 @@ export class SecurityIncidentReportService {
   
   }
 
-  searchDocuments(keywords: string[], searchType: string): Observable<SecurityIncidentReportResponse[]> {
+  searchDocuments(request: DocumentSearchRequest, searchType: string): Observable<SecurityIncidentReportResponse[]> {
     return this.http.post<SecurityIncidentReportResponse[]>(
       `${this.baseUrl}/search/${searchType}`,
-      { searchKeywords: keywords }
+       request
     );
   }
 }
